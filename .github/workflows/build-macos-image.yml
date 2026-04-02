@@ -100,10 +100,10 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-            tag: v1.0
-            name: Release v1.0
-            files: ${{ steps.create_image.outputs.image_name }}
-
+           tag: v2.0
+           name: Release v2.0
+           artifacts: ${{ steps.create_image.outputs.image_name }}
+    
       - name: Summary
         if: always()
         run: |
