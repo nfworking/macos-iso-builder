@@ -97,13 +97,38 @@ jobs:
             echo "image_name=$(basename *.dmg.img)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-           tag: v4.0
-           name: Release v5.0
-           artifacts: ${{ steps.create_image.outputs.image_name }}
-    
+      - name: Upload ISO to Azure
+        run: |
+          FILE="${{ steps.create_image.outputs.image_name }}"
+          NAME=$(basename "$FILE")
+
+          az storage blob upload \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
+            --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+            --container-name isos \
+            --name "$NAME" \
+            --file "$FILE" \
+            --overwrite
+
+      - name: Generate download link
+        run: |
+          FILE="${{ steps.create_image.outputs.image_name }}"
+          NAME=$(basename "$FILE")
+
+          SAS=$(az storage blob generate-sas \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
+            --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+            --container-name isos \
+            --name "$NAME" \
+            --permissions r \
+            --expiry $(date -u -d "7 days" '+%Y-%m-%dT%H:%MZ') \
+            --output tsv)
+
+          URL="https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/isos/$NAME?$SAS"
+
+          echo "Download URL:"
+          echo "$URL"
+
       - name: Summary
         if: always()
         run: |
