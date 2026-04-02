@@ -97,13 +97,12 @@ jobs:
             echo "image_name=$(basename *.dmg.img)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
+      - name: Create Release
+        uses: ncipollo/release-action@v1
         with:
-          path: ${{ steps.create_image.outputs.image_name }}
-          compression-level: 0
-          retention-days: 15
-          archive: false
+            tag: v1.0
+            name: Release v1.0
+            files: ${{ steps.create_image.outputs.image_name }}
 
       - name: Summary
         if: always()
