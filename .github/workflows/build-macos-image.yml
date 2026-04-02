@@ -100,8 +100,8 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-           tag: v2.0
-           name: Release v2.0
+           tag: v4.0
+           name: Release v5.0
            artifacts: ${{ steps.create_image.outputs.image_name }}
     
       - name: Summary
